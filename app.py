@@ -171,6 +171,7 @@ class CommentCleaner:
         df = df[~df[comment_column].apply(self.is_blank_or_empty)].copy()
         blanks_removed = original_count - len(df)
         
+        # Remove emoji-only comments if enabled
         if remove_emoji:
             emoji_only_mask = df[comment_column].apply(self.is_only_emojis)
             emoji_only_count = emoji_only_mask.sum()
@@ -179,9 +180,8 @@ class CommentCleaner:
         
         df['cleaned_comment'] = df[comment_column].copy()
         
-        if remove_emoji:
-            df['cleaned_comment'] = df['cleaned_comment'].apply(self.remove_emojis)
-        
+        # DO NOT strip emojis from comments - only remove emoji-only comments above
+        # Remove URLs, mentions, hashtags as configured
         if remove_url:
             df['cleaned_comment'] = df['cleaned_comment'].apply(self.remove_urls)
         
@@ -210,7 +210,8 @@ class CommentCleaner:
             'retention_rate': round((final_count / original_count) * 100, 2) if original_count > 0 else 0
         }
         
-        self.preview_data = df_cleaned[['cleaned_comment', 'char_count', 'word_count']].copy()
+        # Store preview data without char_count and word_count
+        self.preview_data = df_cleaned[['cleaned_comment']].copy()
         
         df_cleaned[original_comment_col] = df_cleaned['cleaned_comment']
         df_cleaned = df_cleaned.drop(['cleaned_comment', 'char_count', 'word_count'], axis=1)
@@ -233,7 +234,11 @@ min_length = st.sidebar.slider(
 )
 
 st.sidebar.subheader("Remove Elements")
-remove_emoji = st.sidebar.checkbox("Remove Emojis", value=True)
+remove_emoji = st.sidebar.checkbox(
+    "Remove emoji-only comments", 
+    value=True,
+    help="Removes comments containing ONLY emojis (e.g., '😂😂😂'). Keeps comments with text + emojis."
+)
 remove_url = st.sidebar.checkbox("Remove URLs", value=True)
 remove_mention = st.sidebar.checkbox("Remove @Mentions", value=False)
 remove_hashtag = st.sidebar.checkbox("Remove #Hashtags", value=False)
@@ -367,18 +372,7 @@ if uploaded_file is not None:
                     
                     st.subheader("📋 Final Output Columns")
                     st.write(", ".join(cleaned_df.columns))
-                    st.info("ℹ️ Note: Original comment column replaced with cleaned version. Metric columns (char_count, word_count) removed from export.")
-                    
-                    st.subheader("📈 Statistics")
-                    stats_col1, stats_col2 = st.columns(2)
-                    
-                    with stats_col1:
-                        st.write("**Character Count Distribution**")
-                        st.write(cleaner.preview_data['char_count'].describe())
-                    
-                    with stats_col2:
-                        st.write("**Word Count Distribution**")
-                        st.write(cleaner.preview_data['word_count'].describe())
+                    st.info("ℹ️ Note: Original comment column replaced with cleaned version. Emojis are preserved in comments with text.")
                     
                     st.subheader("💾 Download Cleaned Data")
                     
