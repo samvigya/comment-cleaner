@@ -1,47 +1,36 @@
-import streamlit as st
+# ============================================================
+# CELL 1: Install Required Libraries
+# ============================================================
+# Run this first - it will take 10-15 seconds
+
+!pip install emoji openpyxl -q
+
+print("✓ Libraries installed successfully")
+
+
+# ============================================================
+# CELL 2: Import Libraries
+# ============================================================
+
 import pandas as pd
 import re
 import emoji
+from google.colab import files
 import io
-from datetime import datetime
 
-# Page configuration
-st.set_page_config(
-    page_title="Social Media Comment Cleaner",
-    page_icon="🧹",
-    layout="wide"
-)
+print("✓ All imports loaded")
 
-# Custom CSS
-st.markdown("""
-    <style>
-    .main-header {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #1f77b4;
-        margin-bottom: 0.5rem;
-    }
-    .sub-header {
-        font-size: 1.1rem;
-        color: #666;
-        margin-bottom: 2rem;
-    }
-    .stats-box {
-        background-color: #f0f2f6;
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        margin: 1rem 0;
-    }
-    .metric-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1f77b4;
-    }
-    </style>
-""", unsafe_allow_html=True)
+
+# ============================================================
+# CELL 3: Define CommentCleaner Class
+# ============================================================
 
 class CommentCleaner:
-    """Social media comment cleaning engine"""
+    """
+    Cell-by-cell cleaning toolkit for social media comment datasets
+    Handles IG, YT, TT, Reddit, and FB comment exports
+    Auto-detects 'text' or 'comment' columns
+    """
     
     def __init__(self, min_char_length=10):
         self.min_char_length = min_char_length
@@ -54,45 +43,52 @@ class CommentCleaner:
         }
         
     def remove_emojis(self, text):
+        """Remove all emoji characters"""
         if pd.isna(text):
             return text
-        text = str(text)
+        text = str(text)  # Convert to string
         return emoji.replace_emoji(text, replace='')
     
     def remove_urls(self, text):
+        """Remove URLs and web links"""
         if pd.isna(text):
             return text
-        text = str(text)
+        text = str(text)  # Convert to string
         url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
         return re.sub(url_pattern, '', text)
     
     def remove_mentions(self, text):
+        """Remove @ mentions"""
         if pd.isna(text):
             return text
-        text = str(text)
+        text = str(text)  # Convert to string
         return re.sub(r'@\w+', '', text)
     
     def remove_hashtags(self, text):
+        """Remove # hashtags"""
         if pd.isna(text):
             return text
-        text = str(text)
+        text = str(text)  # Convert to string
         return re.sub(r'#\w+', '', text)
     
     def clean_whitespace(self, text):
+        """Normalize excessive whitespace"""
         if pd.isna(text):
             return text
-        text = str(text)
+        text = str(text)  # Convert to string
         text = re.sub(r'\s+', ' ', text)
         return text.strip()
     
     def remove_special_chars(self, text):
+        """Remove excessive special characters and repetitive punctuation"""
         if pd.isna(text):
             return text
-        text = str(text)
+        text = str(text)  # Convert to string
         text = re.sub(r'([!?.]){3,}', r'\1', text)
         return text
     
     def is_blank_or_empty(self, text):
+        """Check if cell is blank, empty, or whitespace only"""
         if pd.isna(text):
             return True
         if text == '':
@@ -102,17 +98,19 @@ class CommentCleaner:
         return False
     
     def is_only_emojis(self, text):
+        """Check if text contains only emojis"""
         if pd.isna(text):
             return False
         no_emoji = emoji.replace_emoji(str(text), replace='')
         return no_emoji.strip() == ''
     
     def is_valid_comment(self, text, min_length):
+        """Check if comment meets minimum quality standards"""
         if pd.isna(text) or text == '':
             self.removed_rows['blank_empty'] += 1
             return False
         
-        cleaned = str(text).strip()
+        cleaned = text.strip()
         
         if cleaned == '':
             self.removed_rows['blank_empty'] += 1
@@ -129,6 +127,7 @@ class CommentCleaner:
         return True
     
     def detect_comment_column(self, df):
+        """Auto-detect if column is 'text' or 'comment'"""
         columns_lower = [col.lower() for col in df.columns]
         
         if 'text' in columns_lower:
@@ -138,6 +137,8 @@ class CommentCleaner:
             idx = columns_lower.index('comment')
             return df.columns[idx]
         else:
+            print("\n⚠ Could not find 'text' or 'comment' column")
+            print(f"Available columns: {list(df.columns)}")
             return None
     
     def clean_dataset(self, df, comment_column=None, 
@@ -146,20 +147,24 @@ class CommentCleaner:
                      remove_mention=False,
                      remove_hashtag=False,
                      min_length=None):
+        """
+        Cell-by-cell cleaning pipeline with blank removal
+        """
         
         if comment_column is None:
             comment_column = self.detect_comment_column(df)
             if comment_column is None:
-                return None, "Could not detect comment column. Available columns: " + ", ".join(df.columns)
+                raise ValueError("Could not auto-detect comment column. Please specify manually.")
+            print(f"✓ Detected comment column: '{comment_column}'")
         
         if comment_column not in df.columns:
-            return None, f"Column '{comment_column}' not found in dataset"
+            raise ValueError(f"Column '{comment_column}' not found in dataset")
         
         if min_length is None:
             min_length = self.min_char_length
         
         original_count = len(df)
-        original_comment_col = comment_column
+        original_comment_col = comment_column  # Store original column name
         
         self.removed_rows = {
             'blank_empty': 0,
@@ -168,15 +173,20 @@ class CommentCleaner:
             'only_emojis': 0
         }
         
+        print("\n→ Removing blank/empty cells...")
         df = df[~df[comment_column].apply(self.is_blank_or_empty)].copy()
         blanks_removed = original_count - len(df)
+        print(f"  Removed {blanks_removed:,} blank rows")
         
         if remove_emoji:
+            print("→ Checking for emoji-only comments...")
             emoji_only_mask = df[comment_column].apply(self.is_only_emojis)
             emoji_only_count = emoji_only_mask.sum()
             self.removed_rows['only_emojis'] = emoji_only_count
             df = df[~emoji_only_mask].copy()
+            print(f"  Removed {emoji_only_count:,} emoji-only comments")
         
+        print("→ Processing each cell...")
         df['cleaned_comment'] = df[comment_column].copy()
         
         if remove_emoji:
@@ -197,6 +207,7 @@ class CommentCleaner:
         df['char_count'] = df['cleaned_comment'].apply(lambda x: len(str(x)) if pd.notna(x) else 0)
         df['word_count'] = df['cleaned_comment'].apply(lambda x: len(str(x).split()) if pd.notna(x) else 0)
         
+        print("→ Applying quality filters...")
         df['is_valid'] = df['cleaned_comment'].apply(lambda x: self.is_valid_comment(x, min_length))
         df_cleaned = df[df['is_valid']].copy()
         df_cleaned = df_cleaned.drop('is_valid', axis=1)
@@ -210,278 +221,243 @@ class CommentCleaner:
             'retention_rate': round((final_count / original_count) * 100, 2) if original_count > 0 else 0
         }
         
-        self.preview_data = df_cleaned[['cleaned_comment', 'char_count', 'word_count']].copy()
-        
+        # Prepare final output: Replace original column with cleaned, remove metrics
         df_cleaned[original_comment_col] = df_cleaned['cleaned_comment']
         df_cleaned = df_cleaned.drop(['cleaned_comment', 'char_count', 'word_count'], axis=1)
         
-        return df_cleaned, None
+        return df_cleaned
+    
+    def print_stats(self):
+        """Display detailed cleaning statistics"""
+        print("\n" + "="*60)
+        print("CLEANING RESULTS - DETAILED BREAKDOWN")
+        print("="*60)
+        print(f"Original comments:          {self.cleaning_stats['original_count']:>10,}")
+        print(f"After blank removal:        {self.cleaning_stats['after_blank_removal']:>10,}")
+        print("-" * 60)
+        print("Removed by category:")
+        print(f"  • Blank/empty cells:      {self.removed_rows['blank_empty']:>10,}")
+        print(f"  • Emoji-only:             {self.removed_rows['only_emojis']:>10,}")
+        print(f"  • Too short:              {self.removed_rows['too_short']:>10,}")
+        print(f"  • Only special chars:     {self.removed_rows['only_special_chars']:>10,}")
+        print("-" * 60)
+        print(f"Final cleaned comments:     {self.cleaning_stats['final_count']:>10,}")
+        print(f"Total removed:              {self.cleaning_stats['total_removed']:>10,}")
+        print(f"Retention rate:             {self.cleaning_stats['retention_rate']:>9.1f}%")
+        print("="*60 + "\n")
 
-# Header
-st.markdown('<div class="main-header">🧹 Social Media Comment Cleaner</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Clean and process comments from Instagram, YouTube, TikTok, Reddit, and Facebook</div>', unsafe_allow_html=True)
+print("✓ CommentCleaner class defined")
 
-# Sidebar configuration
-st.sidebar.header("⚙️ Cleaning Settings")
 
-min_length = st.sidebar.slider(
-    "Minimum Character Length",
-    min_value=5,
-    max_value=50,
-    value=10,
-    help="Comments shorter than this will be removed"
+# ============================================================
+# CELL 4: Upload Your CSV or Excel File
+# ============================================================
+
+print("="*60)
+print("UPLOAD YOUR FILE")
+print("="*60)
+print("\nSupported formats: CSV (.csv) and Excel (.xlsx, .xls)")
+print("Click 'Choose Files' and select your file")
+print("Supports: Instagram, YouTube, TikTok, Reddit, Facebook exports\n")
+
+uploaded = files.upload()
+
+filename = list(uploaded.keys())[0]
+print(f"\n✓ File uploaded: {filename}")
+
+
+# ============================================================
+# CELL 5: Load and Inspect Data
+# ============================================================
+
+# Detect file type and load accordingly
+file_extension = filename.lower().split('.')[-1]
+
+print("="*60)
+print("LOADING FILE")
+print("="*60)
+print(f"File type detected: {file_extension.upper()}")
+
+try:
+    if file_extension == 'csv':
+        # Load CSV file
+        df = pd.read_csv(io.BytesIO(uploaded[filename]), encoding='utf-8', encoding_errors='ignore')
+        print("✓ CSV file loaded successfully")
+    elif file_extension in ['xlsx', 'xls']:
+        # Load Excel file
+        df = pd.read_excel(io.BytesIO(uploaded[filename]), engine='openpyxl' if file_extension == 'xlsx' else None)
+        print("✓ Excel file loaded successfully")
+    else:
+        raise ValueError(f"Unsupported file format: .{file_extension}")
+        
+except Exception as e:
+    print(f"❌ Error loading file: {str(e)}")
+    print("Please ensure your file is a valid CSV or Excel file.")
+    raise
+
+print("="*60)
+print("FILE INSPECTION")
+print("="*60)
+print(f"\nTotal rows loaded: {len(df):,}")
+print(f"\nColumns in your file:")
+for i, col in enumerate(df.columns, 1):
+    print(f"  {i}. {col}")
+
+# Show first few rows
+print("\n" + "-"*60)
+print("First 3 rows preview:")
+print("-"*60)
+print(df.head(3))
+
+# Check for blank values
+print("\n" + "-"*60)
+print("Blank/null value check:")
+print("-"*60)
+null_counts = df.isnull().sum()
+for col in df.columns:
+    if null_counts[col] > 0:
+        print(f"  {col}: {null_counts[col]:,} blank cells")
+
+
+# ============================================================
+# CELL 6: Configure and Run Cleaning
+# ============================================================
+# EDIT THESE SETTINGS BEFORE RUNNING:
+
+print("="*60)
+print("STARTING CLEANING PROCESS")
+print("="*60)
+
+# Initialize the cleaner
+cleaner = CommentCleaner(min_char_length=10)  # Change minimum character count here
+
+# Run the cleaning
+cleaned_df = cleaner.clean_dataset(
+    df, 
+    comment_column=None,      # Auto-detects 'text' or 'comment' - or specify: 'your_column_name'
+    remove_emoji=True,        # Set to False to keep emojis
+    remove_url=True,          # Set to False to keep URLs
+    remove_mention=False,     # Set to True to remove @mentions
+    remove_hashtag=False,     # Set to True to remove #hashtags
+    min_length=10             # Minimum characters after cleaning (change as needed)
 )
 
-st.sidebar.subheader("Remove Elements")
-remove_emoji = st.sidebar.checkbox("Remove Emojis", value=True)
-remove_url = st.sidebar.checkbox("Remove URLs", value=True)
-remove_mention = st.sidebar.checkbox("Remove @Mentions", value=False)
-remove_hashtag = st.sidebar.checkbox("Remove #Hashtags", value=False)
+# Display results
+cleaner.print_stats()
 
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 📊 Platform Averages")
-st.sidebar.markdown("""
-- **YouTube**: 70-75% retention
-- **Instagram**: 65-70% retention
-- **TikTok**: 55-65% retention
-- **Reddit**: 75-82% retention
-- **Facebook**: 60-68% retention
-""")
-
-# Main content
-col1, col2 = st.columns([2, 1])
-
-with col1:
-    st.subheader("📤 Upload Your File")
-    uploaded_file = st.file_uploader(
-        "Choose a CSV or Excel file",
-        type=['csv', 'xlsx', 'xls'],
-        help="Upload your comment dataset (CSV or Excel format)"
-    )
-
-with col2:
-    st.subheader("ℹ️ Quick Guide")
-    st.markdown("""
-    1. Upload CSV/Excel file
-    2. Adjust settings in sidebar
-    3. Click 'Clean Data'
-    4. Download cleaned file
-    """)
-
-if uploaded_file is not None:
-    try:
-        file_extension = uploaded_file.name.lower().split('.')[-1]
-        
-        if file_extension == 'csv':
-            df = pd.read_csv(uploaded_file, encoding='utf-8', encoding_errors='ignore')
-            file_type = "CSV"
-        elif file_extension in ['xlsx', 'xls']:
-            df = pd.read_excel(uploaded_file, engine='openpyxl' if file_extension == 'xlsx' else None)
-            file_type = "Excel"
-        else:
-            st.error(f"Unsupported file format: .{file_extension}")
-            st.stop()
-        
-        st.success(f"✓ {file_type} file loaded: {uploaded_file.name}")
-        
-        with st.expander("📋 View Original Data Info"):
-            st.write(f"**Total Rows:** {len(df):,}")
-            st.write(f"**Columns:** {', '.join(df.columns)}")
-            st.dataframe(df.head(5), use_container_width=True)
-        
-        st.subheader("🎯 Select Comment Column")
-        
-        cleaner = CommentCleaner(min_char_length=min_length)
-        detected_col = cleaner.detect_comment_column(df)
-        
-        if detected_col:
-            st.info(f"Auto-detected column: **{detected_col}**")
-            comment_column = st.selectbox(
-                "Comment Column",
-                options=df.columns,
-                index=list(df.columns).index(detected_col)
-            )
-        else:
-            st.warning("Could not auto-detect comment column. Please select manually.")
-            comment_column = st.selectbox("Comment Column", options=df.columns)
-        
-        if st.button("🧹 Clean Data", type="primary", use_container_width=True):
-            with st.spinner("Cleaning data... This may take a moment for large files."):
-                
-                cleaned_df, error = cleaner.clean_dataset(
-                    df,
-                    comment_column=comment_column,
-                    remove_emoji=remove_emoji,
-                    remove_url=remove_url,
-                    remove_mention=remove_mention,
-                    remove_hashtag=remove_hashtag,
-                    min_length=min_length
-                )
-                
-                if error:
-                    st.error(error)
-                else:
-                    st.success("✓ Cleaning complete!")
-                    
-                    st.subheader("📊 Cleaning Results")
-                    
-                    col1, col2, col3, col4 = st.columns(4)
-                    
-                    with col1:
-                        st.metric("Original", f"{cleaner.cleaning_stats['original_count']:,}")
-                    
-                    with col2:
-                        st.metric("Cleaned", f"{cleaner.cleaning_stats['final_count']:,}")
-                    
-                    with col3:
-                        st.metric("Removed", f"{cleaner.cleaning_stats['total_removed']:,}")
-                    
-                    with col4:
-                        st.metric("Retention", f"{cleaner.cleaning_stats['retention_rate']}%")
-                    
-                    with st.expander("🔍 Detailed Breakdown"):
-                        breakdown_col1, breakdown_col2 = st.columns(2)
-                        
-                        with breakdown_col1:
-                            st.markdown("**Removed by Category:**")
-                            st.write(f"• Blank/Empty: {cleaner.removed_rows['blank_empty']:,}")
-                            st.write(f"• Emoji-only: {cleaner.removed_rows['only_emojis']:,}")
-                        
-                        with breakdown_col2:
-                            st.write(f"• Too Short: {cleaner.removed_rows['too_short']:,}")
-                            st.write(f"• Special Chars Only: {cleaner.removed_rows['only_special_chars']:,}")
-                    
-                    st.subheader("👀 Preview Cleaned Data")
-                    st.dataframe(
-                        cleaner.preview_data.head(20),
-                        use_container_width=True
-                    )
-                    
-                    st.subheader("📋 Final Output Columns")
-                    st.write(", ".join(cleaned_df.columns))
-                    st.info("ℹ️ Note: Original comment column replaced with cleaned version. Metric columns (char_count, word_count) removed from export.")
-                    
-                    st.subheader("📈 Statistics")
-                    stats_col1, stats_col2 = st.columns(2)
-                    
-                    with stats_col1:
-                        st.write("**Character Count Distribution**")
-                        st.write(cleaner.preview_data['char_count'].describe())
-                    
-                    with stats_col2:
-                        st.write("**Word Count Distribution**")
-                        st.write(cleaner.preview_data['word_count'].describe())
-                    
-                    st.subheader("💾 Download Cleaned Data")
-                    
-                    CHUNK_SIZE = 10000
-                    total_rows = len(cleaned_df)
-                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    
-                    if total_rows > CHUNK_SIZE:
-                        num_files = (total_rows // CHUNK_SIZE) + (1 if total_rows % CHUNK_SIZE > 0 else 0)
-                        
-                        st.info(f"📦 Large dataset detected: {total_rows:,} rows will be split into {num_files} files ({CHUNK_SIZE:,} rows each)")
-                        
-                        tabs = st.tabs([f"Part {i+1}" for i in range(num_files)])
-                        
-                        for i, tab in enumerate(tabs):
-                            with tab:
-                                start_idx = i * CHUNK_SIZE
-                                end_idx = min((i + 1) * CHUNK_SIZE, total_rows)
-                                chunk_df = cleaned_df.iloc[start_idx:end_idx]
-                                
-                                st.write(f"**Rows:** {len(chunk_df):,} (rows {start_idx+1:,} to {end_idx:,})")
-                                
-                                col1, col2 = st.columns(2)
-                                
-                                with col1:
-                                    output = io.BytesIO()
-                                    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                                        chunk_df.to_excel(writer, index=False)
-                                    excel_data = output.getvalue()
-                                    
-                                    excel_filename = f"cleaned_comments_{timestamp}_part{i+1}.xlsx"
-                                    
-                                    st.download_button(
-                                        label=f"📥 Download Part {i+1} (Excel)",
-                                        data=excel_data,
-                                        file_name=excel_filename,
-                                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                        use_container_width=True,
-                                        key=f"excel_{i}"
-                                    )
-                                
-                                with col2:
-                                    csv_data = chunk_df.to_csv(index=False).encode('utf-8')
-                                    csv_filename = f"cleaned_comments_{timestamp}_part{i+1}.csv"
-                                    
-                                    st.download_button(
-                                        label=f"📥 Download Part {i+1} (CSV)",
-                                        data=csv_data,
-                                        file_name=csv_filename,
-                                        mime="text/csv",
-                                        use_container_width=True,
-                                        key=f"csv_{i}"
-                                    )
-                    
-                    else:
-                        download_col1, download_col2 = st.columns(2)
-                        
-                        with download_col1:
-                            output = io.BytesIO()
-                            with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                                cleaned_df.to_excel(writer, index=False)
-                            excel_data = output.getvalue()
-                            
-                            excel_filename = f"cleaned_comments_{timestamp}.xlsx"
-                            
-                            st.download_button(
-                                label="📥 Download as Excel",
-                                data=excel_data,
-                                file_name=excel_filename,
-                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                use_container_width=True
-                            )
-                        
-                        with download_col2:
-                            csv_data = cleaned_df.to_csv(index=False).encode('utf-8')
-                            csv_filename = f"cleaned_comments_{timestamp}.csv"
-                            
-                            st.download_button(
-                                label="📥 Download as CSV",
-                                data=csv_data,
-                                file_name=csv_filename,
-                                mime="text/csv",
-                                use_container_width=True
-                            )
+# Ask user about file splitting preference
+print("\n" + "="*60)
+print("EXPORT OPTIONS")
+print("="*60)
+if len(cleaned_df) > 10000:
+    print(f"\nYour cleaned dataset has {len(cleaned_df):,} rows.")
+    print("Would you like to:")
+    print("  1. Split into multiple files (10,000 rows each)")
+    print("  2. Download as single file (all rows)")
     
-    except Exception as e:
-        st.error(f"Error processing file: {str(e)}")
-        st.info("Make sure your file is a valid CSV or Excel file with proper encoding.")
-
+    choice = input("\nEnter your choice (1 or 2): ").strip()
+    SPLIT_FILES = (choice == "1")
 else:
-    st.info("👆 Upload a CSV or Excel file to get started")
-    
-    with st.expander("💡 Example File Format"):
-        st.markdown("""
-        Your file (CSV or Excel) should have a column named either **'text'** or **'comment'** containing the comments:
-        
-        | text | username | date |
-        |------|----------|------|
-        | Great video! 👍 | user123 | 2024-01-15 |
-        | First comment!! | user456 | 2024-01-15 |
-        | Check this link http://spam.com | bot789 | 2024-01-15 |
-        
-        **Supported formats:**
-        - CSV files (.csv)
-        - Excel files (.xlsx, .xls)
-        
-        Other columns will be preserved in the output.
-        """)
+    SPLIT_FILES = False  # No need to ask if file is small
 
-st.markdown("---")
-st.markdown(
-    "<div style='text-align: center; color: #666;'>Made for internal team use • Data processed locally • Not stored</div>",
-    unsafe_allow_html=True
-)
+
+# ============================================================
+# CELL 7: Preview Cleaned Data
+# ============================================================
+
+print("="*60)
+print("CLEANED DATA PREVIEW")
+print("="*60)
+
+# Show sample of cleaned comments
+print("\nFirst 10 cleaned rows:")
+print("-"*60)
+print(cleaned_df.head(10).to_string(index=False))
+
+print("\n" + "-"*60)
+print("Final columns in output:")
+print("-"*60)
+for col in cleaned_df.columns:
+    print(f"  • {col}")
+
+
+# ============================================================
+# CELL 8: Export and Download (with Optional Auto-Split)
+# ============================================================
+
+print("="*60)
+print("EXPORTING CLEANED DATA")
+print("="*60)
+
+CHUNK_SIZE = 10000  # Split into files of 10,000 rows each
+
+total_rows = len(cleaned_df)
+
+# Create base filename (remove original extension)
+base_filename = '.'.join(filename.split('.')[:-1]) + '_cleaned'
+
+# Check if we need to split AND if user wants splitting
+if total_rows > CHUNK_SIZE and SPLIT_FILES:
+    num_files = (total_rows // CHUNK_SIZE) + (1 if total_rows % CHUNK_SIZE > 0 else 0)
+    
+    print(f"\n📦 Splitting {total_rows:,} rows into {num_files} files ({CHUNK_SIZE:,} rows each)")
+    print("-" * 60)
+    
+    exported_files = []
+    
+    for i in range(num_files):
+        start_idx = i * CHUNK_SIZE
+        end_idx = min((i + 1) * CHUNK_SIZE, total_rows)
+        chunk_df = cleaned_df.iloc[start_idx:end_idx]
+        
+        # Create filename with part number (always export as Excel)
+        part_filename = f"{base_filename}_part{i+1}.xlsx"
+        chunk_df.to_excel(part_filename, index=False, engine='openpyxl')
+        
+        exported_files.append(part_filename)
+        print(f"✓ Part {i+1}: {part_filename} ({len(chunk_df):,} rows)")
+    
+    print("-" * 60)
+    print(f"✓ Total files created: {num_files}")
+    print(f"✓ Total rows exported: {total_rows:,}")
+    
+    # Download all files
+    print("\n" + "="*60)
+    print("DOWNLOADING FILES...")
+    print("="*60)
+    
+    for file in exported_files:
+        files.download(file)
+        print(f"✓ Downloaded: {file}")
+    
+else:
+    # Single file export
+    if total_rows > CHUNK_SIZE and not SPLIT_FILES:
+        print(f"\nℹ️ Exporting all {total_rows:,} rows as single file")
+    
+    output_filename = f"{base_filename}.xlsx"
+    cleaned_df.to_excel(output_filename, index=False, engine='openpyxl')
+    
+    print(f"\n✓ File exported: {output_filename}")
+    print(f"✓ Total rows exported: {total_rows:,}")
+    
+    print("\n" + "="*60)
+    print("DOWNLOADING FILE...")
+    print("="*60)
+    files.download(output_filename)
+    print("✓ Download started!")
+
+print(f"\nColumns in cleaned file(s):")
+for col in cleaned_df.columns:
+    print(f"  • {col}")
+
+print("\n" + "="*60)
+print("NOTE: Original comment column replaced with cleaned version")
+print("Metric columns (char_count, word_count) removed from export")
+print("All files exported as Excel (.xlsx) format")
+print("="*60)
+
+print("\n✓ Check your browser's download folder")
+print("\n" + "="*60)
+print("PROCESS COMPLETE")
+print("="*60)
