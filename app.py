@@ -22,7 +22,7 @@ if 'cleaned_results' not in st.session_state:
 if 'processing_complete' not in st.session_state:
     st.session_state.processing_complete = False
 
-# FIXED Custom CSS - Proper Contrast & Sizing
+# FIXED CSS - No overflow, proper fitting
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -36,23 +36,24 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Main background - LIGHT VERSION */
+    /* Main container - FIXED OVERFLOW */
     .stApp {
         background: #f8fafc;
     }
     
-    /* Content container - WHITE BACKGROUND */
     .main .block-container {
         background: white;
         border-radius: 16px;
         padding: 2rem;
-        max-width: 1400px;
+        max-width: 100%;
+        overflow-x: hidden;
     }
     
-    /* Hero Header - READABLE */
+    /* Hero Header */
     .hero-header {
         text-align: center;
-        padding: 2rem 0 2rem 0;
+        padding: 1.5rem 0;
+        margin-bottom: 1rem;
     }
     
     .hero-title {
@@ -71,7 +72,7 @@ st.markdown("""
         font-weight: 400;
     }
     
-    /* Metric Cards - FIXED CONTRAST */
+    /* Metric Cards */
     .metric-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 12px;
@@ -80,6 +81,7 @@ st.markdown("""
         text-align: center;
         box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.3);
         transition: all 0.3s ease;
+        margin-bottom: 1rem;
     }
     
     .metric-card:hover {
@@ -102,7 +104,7 @@ st.markdown("""
         color: rgba(255, 255, 255, 0.9);
     }
     
-    /* Platform Badges - SMALLER & CLEANER */
+    /* Platform Badges */
     .platform-badge {
         display: inline-flex;
         align-items: center;
@@ -123,10 +125,9 @@ st.markdown("""
     .badge-linkedin { background: #0077B5; color: white; }
     .badge-other { background: #6c757d; color: white; }
     
-    /* Sidebar - FIXED CONTRAST */
+    /* Sidebar */
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-        color: white;
     }
     
     section[data-testid="stSidebar"] > div {
@@ -136,15 +137,11 @@ st.markdown("""
     section[data-testid="stSidebar"] h3,
     section[data-testid="stSidebar"] label,
     section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] div {
+    section[data-testid="stSidebar"] div,
+    section[data-testid="stSidebar"] .stMarkdown {
         color: white !important;
     }
     
-    section[data-testid="stSidebar"] .stMarkdown {
-        color: white;
-    }
-    
-    /* Sidebar info box */
     .sidebar-info {
         background: rgba(255, 255, 255, 0.15);
         backdrop-filter: blur(10px);
@@ -155,24 +152,8 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    /* Sidebar divider */
     section[data-testid="stSidebar"] hr {
         border-color: rgba(255, 255, 255, 0.2);
-    }
-    
-    /* Upload Section Card */
-    .upload-card {
-        background: white;
-        border: 2px dashed #cbd5e0;
-        border-radius: 12px;
-        padding: 2rem;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-    
-    .upload-card:hover {
-        border-color: #667eea;
-        background: #f8fafc;
     }
     
     /* Section Headers */
@@ -180,13 +161,10 @@ st.markdown("""
         font-size: 1.5rem;
         font-weight: 700;
         color: #1e293b;
-        margin: 2rem 0 1rem 0;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        margin: 1.5rem 0 1rem 0;
     }
     
-    /* Quick Start Card - FIXED ICONS */
+    /* Quick Start Card */
     .quick-start-card {
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
         border-radius: 12px;
@@ -221,7 +199,7 @@ st.markdown("""
         font-weight: 500;
     }
     
-    /* Feature Cards - SMALLER */
+    /* Feature Cards */
     .feature-card {
         background: white;
         border: 1px solid #e2e8f0;
@@ -230,6 +208,7 @@ st.markdown("""
         text-align: center;
         transition: all 0.3s ease;
         height: 100%;
+        margin-bottom: 1rem;
     }
     
     .feature-card:hover {
@@ -256,7 +235,7 @@ st.markdown("""
         line-height: 1.5;
     }
     
-    /* Results Card */
+    /* Results Header */
     .results-header {
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
         border-radius: 12px;
@@ -284,7 +263,7 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     
-    /* Success/Error/Info Messages */
+    /* Messages */
     .stSuccess, .stError, .stInfo, .stWarning {
         border-radius: 8px;
         padding: 0.75rem 1rem;
@@ -297,7 +276,7 @@ st.markdown("""
         margin: 2rem 0;
     }
     
-    /* Custom Scrollbar */
+    /* Scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -316,7 +295,7 @@ st.markdown("""
         background: #94a3b8;
     }
     
-    /* File uploader styling */
+    /* File uploader */
     [data-testid="stFileUploader"] {
         background: white;
         border-radius: 12px;
@@ -341,11 +320,6 @@ st.markdown("""
     
     .streamlit-expanderHeader:hover {
         background: #f1f5f9;
-    }
-    
-    /* Dataframe */
-    .dataframe {
-        font-size: 0.875rem;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -718,76 +692,97 @@ if uploaded_files:
     
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
     
-    # Process button
+    # Process button - FIXED
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("🚀 Start Cleaning Process", type="primary", use_container_width=True):
-            st.session_state.cleaned_results = []
-            st.session_state.processing_complete = False
-            
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            
-            for idx, uploaded_file in enumerate(uploaded_files):
-                try:
-                    progress = (idx + 1) / len(uploaded_files)
-                    progress_bar.progress(progress)
-                    status_text.markdown(f"**Processing:** {uploaded_file.name} ({idx+1}/{len(uploaded_files)})")
-                    
-                    file_extension = uploaded_file.name.lower().split('.')[-1]
-                    
-                    if file_extension == 'csv':
+        process_button = st.button("🚀 Start Cleaning Process", type="primary", use_container_width=True)
+    
+    # FIXED: Process files when button is clicked
+    if process_button:
+        # Reset session state
+        st.session_state.cleaned_results = []
+        st.session_state.processing_complete = False
+        
+        # Create progress indicators
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
+        # Process each file
+        for idx, uploaded_file in enumerate(uploaded_files):
+            try:
+                # Update progress
+                progress = (idx + 1) / len(uploaded_files)
+                progress_bar.progress(progress)
+                status_text.markdown(f"**Processing:** {uploaded_file.name} ({idx+1}/{len(uploaded_files)})")
+                
+                file_extension = uploaded_file.name.lower().split('.')[-1]
+                
+                # Read file
+                if file_extension == 'csv':
+                    try:
+                        df = pd.read_csv(uploaded_file, encoding='utf-8')
+                    except:
+                        uploaded_file.seek(0)
                         try:
-                            df = pd.read_csv(uploaded_file, encoding='utf-8')
+                            df = pd.read_csv(uploaded_file, encoding='utf-8-sig')
                         except:
                             uploaded_file.seek(0)
-                            try:
-                                df = pd.read_csv(uploaded_file, encoding='utf-8-sig')
-                            except:
-                                uploaded_file.seek(0)
-                                df = pd.read_csv(uploaded_file, encoding='latin-1')
-                    elif file_extension in ['xlsx', 'xls']:
-                        df = pd.read_excel(uploaded_file, engine='openpyxl' if file_extension == 'xlsx' else None)
-                    else:
-                        continue
-                    
-                    cleaner = CommentCleaner(min_char_length=min_length)
-                    detected_col = cleaner.detect_comment_column(df)
-                    
-                    if not detected_col:
-                        st.error(f"❌ {uploaded_file.name}: Could not detect comment column")
-                        continue
-                    
-                    cleaned_df, error = cleaner.clean_dataset(
-                        df,
-                        comment_column=detected_col,
-                        remove_emoji=remove_emoji,
-                        remove_url=remove_url,
-                        remove_mention=remove_mention,
-                        remove_hashtag=remove_hashtag,
-                        min_length=min_length
-                    )
-                    
-                    if error:
-                        st.error(f"❌ {uploaded_file.name}: {error}")
-                        continue
-                    
-                    st.session_state.cleaned_results.append({
-                        'filename': uploaded_file.name,
-                        'platform': file_platforms[uploaded_file.name],
-                        'cleaned_df': cleaned_df,
-                        'stats': cleaner.cleaning_stats.copy(),
-                        'removed': cleaner.removed_rows.copy(),
-                        'preview': cleaner.preview_data.copy()
-                    })
-                    
-                except Exception as e:
-                    st.error(f"❌ Error processing {uploaded_file.name}: {str(e)}")
-            
-            progress_bar.progress(1.0)
-            status_text.markdown("✅ **All files processed successfully!**")
-            st.session_state.processing_complete = True
-            st.rerun()
+                            df = pd.read_csv(uploaded_file, encoding='latin-1')
+                elif file_extension in ['xlsx', 'xls']:
+                    df = pd.read_excel(uploaded_file, engine='openpyxl' if file_extension == 'xlsx' else None)
+                else:
+                    st.warning(f"⚠️ Unsupported file type: {uploaded_file.name}")
+                    continue
+                
+                # Create cleaner instance
+                cleaner = CommentCleaner(min_char_length=min_length)
+                
+                # Detect comment column
+                detected_col = cleaner.detect_comment_column(df)
+                
+                if not detected_col:
+                    st.error(f"❌ {uploaded_file.name}: Could not detect comment column. Available columns: {', '.join(df.columns)}")
+                    continue
+                
+                # Clean the dataset
+                cleaned_df, error = cleaner.clean_dataset(
+                    df,
+                    comment_column=detected_col,
+                    remove_emoji=remove_emoji,
+                    remove_url=remove_url,
+                    remove_mention=remove_mention,
+                    remove_hashtag=remove_hashtag,
+                    min_length=min_length
+                )
+                
+                if error:
+                    st.error(f"❌ {uploaded_file.name}: {error}")
+                    continue
+                
+                # Store results
+                st.session_state.cleaned_results.append({
+                    'filename': uploaded_file.name,
+                    'platform': file_platforms[uploaded_file.name],
+                    'cleaned_df': cleaned_df,
+                    'stats': cleaner.cleaning_stats.copy(),
+                    'removed': cleaner.removed_rows.copy(),
+                    'preview': cleaner.preview_data.copy()
+                })
+                
+                st.success(f"✅ Successfully processed: {uploaded_file.name}")
+                
+            except Exception as e:
+                st.error(f"❌ Error processing {uploaded_file.name}: {str(e)}")
+                import traceback
+                st.error(traceback.format_exc())
+        
+        # Mark as complete
+        progress_bar.progress(1.0)
+        status_text.markdown("✅ **All files processed successfully!**")
+        st.session_state.processing_complete = True
+        
+        # Force rerun to show results
+        st.rerun()
 
 # Display results
 if st.session_state.processing_complete and st.session_state.cleaned_results:
@@ -823,30 +818,31 @@ if st.session_state.processing_complete and st.session_state.cleaned_results:
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
     
     # Processing summary chart
-    chart_data = pd.DataFrame([
-        {'File': r['filename'][:20] + '...' if len(r['filename']) > 20 else r['filename'],
-         'Original': r['stats']['original_count'],
-         'Cleaned': r['stats']['final_count'],
-         'Removed': r['stats']['total_removed']}
-        for r in st.session_state.cleaned_results
-    ])
-    
-    fig = go.Figure()
-    fig.add_trace(go.Bar(name='Original', x=chart_data['File'], y=chart_data['Original'],
-                         marker_color='#667eea'))
-    fig.add_trace(go.Bar(name='Cleaned', x=chart_data['File'], y=chart_data['Cleaned'],
-                         marker_color='#10b981'))
-    
-    fig.update_layout(
-        title="Processing Summary by File",
-        barmode='group',
-        template='plotly_white',
-        height=400,
-        showlegend=True,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-    )
-    
-    st.plotly_chart(fig, use_container_width=True)
+    if len(st.session_state.cleaned_results) > 0:
+        chart_data = pd.DataFrame([
+            {'File': r['filename'][:20] + '...' if len(r['filename']) > 20 else r['filename'],
+             'Original': r['stats']['original_count'],
+             'Cleaned': r['stats']['final_count'],
+             'Removed': r['stats']['total_removed']}
+            for r in st.session_state.cleaned_results
+        ])
+        
+        fig = go.Figure()
+        fig.add_trace(go.Bar(name='Original', x=chart_data['File'], y=chart_data['Original'],
+                             marker_color='#667eea'))
+        fig.add_trace(go.Bar(name='Cleaned', x=chart_data['File'], y=chart_data['Cleaned'],
+                             marker_color='#10b981'))
+        
+        fig.update_layout(
+            title="Processing Summary by File",
+            barmode='group',
+            template='plotly_white',
+            height=400,
+            showlegend=True,
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
     
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
     
@@ -987,30 +983,31 @@ if st.session_state.processing_complete and st.session_state.cleaned_results:
 
 else:
     # Empty state with features
-    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="section-header">🌟 Key Features</div>', unsafe_allow_html=True)
-    
-    feature_cols = st.columns(3)
-    
-    features = [
-        ("🌍", "Multilingual Support", "Process comments in 50+ languages with Unicode-aware cleaning"),
-        ("⚡", "Batch Processing", "Upload and process multiple files simultaneously"),
-        ("🎯", "Smart Detection", "Auto-detects writing systems and applies adaptive thresholds"),
-        ("📊", "Visual Analytics", "Interactive charts showing processing results"),
-        ("🔒", "Privacy First", "All processing happens locally - no data stored"),
-        ("📦", "Flexible Export", "Download as Excel or CSV with auto-splitting for large datasets")
-    ]
-    
-    for col, (icon, title, desc) in zip(feature_cols * 2, features):
-        with col:
-            st.markdown(f"""
-                <div class="feature-card">
-                    <div class="feature-icon">{icon}</div>
-                    <div class="feature-title">{title}</div>
-                    <div class="feature-description">{desc}</div>
-                </div>
-            """, unsafe_allow_html=True)
+    if not uploaded_files:
+        st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+        
+        st.markdown('<div class="section-header">🌟 Key Features</div>', unsafe_allow_html=True)
+        
+        feature_cols = st.columns(3)
+        
+        features = [
+            ("🌍", "Multilingual Support", "Process comments in 50+ languages with Unicode-aware cleaning"),
+            ("⚡", "Batch Processing", "Upload and process multiple files simultaneously"),
+            ("🎯", "Smart Detection", "Auto-detects writing systems and applies adaptive thresholds"),
+            ("📊", "Visual Analytics", "Interactive charts showing processing results"),
+            ("🔒", "Privacy First", "All processing happens locally - no data stored"),
+            ("📦", "Flexible Export", "Download as Excel or CSV with auto-splitting for large datasets")
+        ]
+        
+        for col, (icon, title, desc) in zip(feature_cols * 2, features):
+            with col:
+                st.markdown(f"""
+                    <div class="feature-card">
+                        <div class="feature-icon">{icon}</div>
+                        <div class="feature-title">{title}</div>
+                        <div class="feature-description">{desc}</div>
+                    </div>
+                """, unsafe_allow_html=True)
 
 # Footer
 st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
@@ -1018,7 +1015,7 @@ st.markdown("""
     <div style='text-align: center; padding: 1.5rem; color: #64748b;'>
         <div style='font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;'>✨ CleanStream AI</div>
         <div style='font-size: 0.875rem;'>
-            Powered by Unicode Intelligence • Built by Samvigya Trivedi • Data Processed Locally
+            Powered by Unicode Intelligence • Built for Global Teams • Data Processed Locally
         </div>
         <div style='margin-top: 0.75rem; font-size: 0.75rem; opacity: 0.7;'>
             v2.0 | Supporting 50+ Languages Worldwide
