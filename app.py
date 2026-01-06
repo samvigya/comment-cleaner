@@ -24,7 +24,7 @@ if 'processing_complete' not in st.session_state:
 if 'file_platforms' not in st.session_state:
     st.session_state.file_platforms = {}
 
-# FIXED CSS with sidebar toggle button
+# FIXED CSS - Sidebar Always Visible, No Collapse Button
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -38,6 +38,23 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
+    /* HIDE SIDEBAR COLLAPSE BUTTON COMPLETELY */
+    [data-testid="collapsedControl"] {
+        display: none !important;
+    }
+    
+    /* FORCE SIDEBAR TO STAY VISIBLE */
+    section[data-testid="stSidebar"] {
+        position: relative !important;
+        transform: none !important;
+        transition: none !important;
+    }
+    
+    section[data-testid="stSidebar"] > div {
+        transform: none !important;
+        transition: none !important;
+    }
+    
     /* Clean base */
     .stApp {
         background: #fafbfc;
@@ -46,39 +63,6 @@ st.markdown("""
     .main .block-container {
         max-width: 1200px;
         padding: 2rem 1rem;
-    }
-    
-    /* SIDEBAR TOGGLE BUTTON - ALWAYS VISIBLE */
-    .sidebar-toggle {
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 999999;
-        background: white;
-        border: 2px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 0.5rem;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #2d3748;
-    }
-    
-    .sidebar-toggle:hover {
-        background: #667eea;
-        color: white;
-        border-color: #667eea;
-        transform: translateX(2px);
-    }
-    
-    /* When sidebar is open, move toggle to the right */
-    [data-testid="stSidebar"] ~ div .sidebar-toggle {
-        left: 320px;
     }
     
     /* Compact header */
@@ -166,7 +150,7 @@ st.markdown("""
     .badge-linkedin { background: #0077B5; }
     .badge-other { background: #6c757d; }
     
-    /* Sidebar - clean white */
+    /* Sidebar - clean white, always visible */
     section[data-testid="stSidebar"] {
         background: white;
         border-right: 1px solid #e2e8f0;
@@ -352,37 +336,6 @@ st.markdown("""
         font-size: 1.5rem;
     }
     </style>
-    
-    <script>
-    // Add sidebar toggle functionality
-    function toggleSidebar() {
-        const sidebar = window.parent.document.querySelector('[data-testid="stSidebar"]');
-        const collapseButton = window.parent.document.querySelector('[data-testid="collapsedControl"]');
-        
-        if (sidebar) {
-            if (sidebar.style.transform === 'translateX(-100%)' || !sidebar.style.transform) {
-                // Sidebar is collapsed, show it
-                sidebar.style.transform = 'translateX(0)';
-            } else {
-                // Sidebar is visible, collapse it
-                sidebar.style.transform = 'translateX(-100%)';
-            }
-        } else if (collapseButton) {
-            collapseButton.click();
-        }
-    }
-    </script>
-""", unsafe_allow_html=True)
-
-# Add floating sidebar toggle button
-st.markdown("""
-    <div class="sidebar-toggle" onclick="toggleSidebar()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="9" y1="3" x2="9" y2="21"></line>
-        </svg>
-        <span>Settings</span>
-    </div>
 """, unsafe_allow_html=True)
 
 class CommentCleaner:
@@ -627,7 +580,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Sidebar
+# Sidebar - Always Visible
 with st.sidebar:
     st.markdown("### ⚙️ Settings")
     
@@ -655,11 +608,10 @@ with st.sidebar:
     st.markdown("### 📦 Export")
     split_files = st.checkbox("Split large files (10k+ rows)", value=True)
 
-# Main tabs - separate upload from results
+# Main tabs
 tab1, tab2 = st.tabs(["📤 Upload & Process", "📊 Results"])
 
 with tab1:
-    # Upload section
     st.markdown("### Upload Files")
     uploaded_files = st.file_uploader(
         "Choose CSV or Excel files",
@@ -671,7 +623,6 @@ with tab1:
     if uploaded_files:
         st.success(f"✓ {len(uploaded_files)} file(s) uploaded")
         
-        # Platform labeling - compact grid
         st.markdown("### Label Platforms")
         
         cols = st.columns(min(len(uploaded_files), 3))
@@ -689,7 +640,6 @@ with tab1:
         
         st.markdown("---")
         
-        # Process button
         if st.button("🚀 Start Processing", type="primary", use_container_width=True):
             st.session_state.cleaned_results = []
             st.session_state.processing_complete = False
@@ -757,7 +707,6 @@ with tab1:
     else:
         st.info("👆 Upload files to get started")
         
-        # Quick features
         col1, col2, col3 = st.columns(3)
         with col1:
             st.markdown("**🌍 Multilingual**")
@@ -772,7 +721,6 @@ with tab1:
 with tab2:
     if st.session_state.processing_complete and st.session_state.cleaned_results:
         
-        # Overall summary
         total_original = sum(r['stats']['original_count'] for r in st.session_state.cleaned_results)
         total_cleaned = sum(r['stats']['final_count'] for r in st.session_state.cleaned_results)
         total_removed = total_original - total_cleaned
@@ -803,7 +751,6 @@ with tab2:
         
         st.markdown("---")
         
-        # Individual results - compact cards
         st.markdown("### Processed Files")
         
         for idx, result in enumerate(st.session_state.cleaned_results):
@@ -819,14 +766,12 @@ with tab2:
                     </div>
                 """, unsafe_allow_html=True)
                 
-                # Stats in columns
                 col1, col2, col3, col4 = st.columns(4)
                 col1.metric("Original", f"{result['stats']['original_count']:,}")
                 col2.metric("Cleaned", f"{result['stats']['final_count']:,}")
                 col3.metric("Removed", f"{result['stats']['total_removed']:,}")
                 col4.metric("Retention", f"{result['stats']['retention_rate']}%")
                 
-                # Collapsible details
                 with st.expander("📋 View Details"):
                     detail_col1, detail_col2 = st.columns(2)
                     
@@ -839,7 +784,6 @@ with tab2:
                         st.markdown("**Sample Preview**")
                         st.dataframe(result['preview'].head(5), use_container_width=True, height=200)
                 
-                # Download section - compact
                 with st.expander("💾 Download Options"):
                     cleaned_df = result['cleaned_df']
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -877,7 +821,6 @@ with tab2:
                 
                 st.markdown("---")
         
-        # Reset button
         if st.button("🔄 Process New Files", use_container_width=True):
             st.session_state.cleaned_results = []
             st.session_state.processing_complete = False
