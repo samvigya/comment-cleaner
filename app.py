@@ -559,7 +559,7 @@ class CommentCleaner:
 st.markdown("""
     <div class="app-header">
         <div class="app-title">✨ CleanStream AI</div>
-        <div class="app-subtitle">Multilingual social media comment cleaner • 50+ languages supported</div>
+        <div class="app-subtitle">Multilingual social media comment cleaner • 50+ languages supported • Built by Samvigya Trivedi</div>
     </div>
 """, unsafe_allow_html=True)
 
