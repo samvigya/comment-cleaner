@@ -24,7 +24,7 @@ if 'processing_complete' not in st.session_state:
 if 'file_platforms' not in st.session_state:
     st.session_state.file_platforms = {}
 
-# REDESIGNED CSS - Clean, Modern, Contained
+# FIXED CSS with sidebar toggle button
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -46,6 +46,39 @@ st.markdown("""
     .main .block-container {
         max-width: 1200px;
         padding: 2rem 1rem;
+    }
+    
+    /* SIDEBAR TOGGLE BUTTON - ALWAYS VISIBLE */
+    .sidebar-toggle {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 999999;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.5rem;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #2d3748;
+    }
+    
+    .sidebar-toggle:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+        transform: translateX(2px);
+    }
+    
+    /* When sidebar is open, move toggle to the right */
+    [data-testid="stSidebar"] ~ div .sidebar-toggle {
+        left: 320px;
     }
     
     /* Compact header */
@@ -319,6 +352,37 @@ st.markdown("""
         font-size: 1.5rem;
     }
     </style>
+    
+    <script>
+    // Add sidebar toggle functionality
+    function toggleSidebar() {
+        const sidebar = window.parent.document.querySelector('[data-testid="stSidebar"]');
+        const collapseButton = window.parent.document.querySelector('[data-testid="collapsedControl"]');
+        
+        if (sidebar) {
+            if (sidebar.style.transform === 'translateX(-100%)' || !sidebar.style.transform) {
+                // Sidebar is collapsed, show it
+                sidebar.style.transform = 'translateX(0)';
+            } else {
+                // Sidebar is visible, collapse it
+                sidebar.style.transform = 'translateX(-100%)';
+            }
+        } else if (collapseButton) {
+            collapseButton.click();
+        }
+    }
+    </script>
+""", unsafe_allow_html=True)
+
+# Add floating sidebar toggle button
+st.markdown("""
+    <div class="sidebar-toggle" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+        </svg>
+        <span>Settings</span>
+    </div>
 """, unsafe_allow_html=True)
 
 class CommentCleaner:
@@ -559,7 +623,7 @@ class CommentCleaner:
 st.markdown("""
     <div class="app-header">
         <div class="app-title">✨ CleanStream AI</div>
-        <div class="app-subtitle">Multilingual social media comment cleaner • 50+ languages supported • Built by Samvigya Trivedi</div>
+        <div class="app-subtitle">Multilingual social media comment cleaner • 50+ languages supported</div>
     </div>
 """, unsafe_allow_html=True)
 
