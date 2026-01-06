@@ -21,10 +21,8 @@ if 'cleaned_results' not in st.session_state:
     st.session_state.cleaned_results = []
 if 'processing_complete' not in st.session_state:
     st.session_state.processing_complete = False
-if 'dark_mode' not in st.session_state:
-    st.session_state.dark_mode = False
 
-# Modern Custom CSS with Gradients and Animations
+# FIXED Custom CSS - Proper Contrast & Sizing
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -38,407 +36,316 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Main background with gradient */
+    /* Main background - LIGHT VERSION */
     .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        background-attachment: fixed;
+        background: #f8fafc;
     }
     
-    /* Content container with glassmorphism */
+    /* Content container - WHITE BACKGROUND */
     .main .block-container {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 24px;
-        padding: 3rem 2rem;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        margin-top: 2rem;
-        margin-bottom: 2rem;
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 1400px;
     }
     
-    /* Hero Header */
+    /* Hero Header - READABLE */
     .hero-header {
         text-align: center;
-        padding: 2rem 0 3rem 0;
+        padding: 2rem 0 2rem 0;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        animation: gradient 3s ease infinite;
-        background-size: 200% 200%;
-    }
-    
-    @keyframes gradient {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
-    }
-    
-    .hero-title {
-        font-size: 3.5rem;
-        font-weight: 800;
         margin-bottom: 0.5rem;
-        letter-spacing: -0.02em;
     }
     
     .hero-subtitle {
-        font-size: 1.25rem;
+        font-size: 1rem;
         color: #64748b;
         font-weight: 400;
-        margin-bottom: 2rem;
     }
     
-    /* Custom Cards */
-    .custom-card {
-        background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        transition: all 0.3s ease;
-        border: 1px solid #e2e8f0;
-        margin-bottom: 1.5rem;
-    }
-    
-    .custom-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-    
-    /* Metric Cards */
+    /* Metric Cards - FIXED CONTRAST */
     .metric-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 16px;
-        padding: 1.5rem;
+        border-radius: 12px;
+        padding: 1.25rem;
         color: white;
         text-align: center;
-        box-shadow: 0 10px 15px -3px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.3);
         transition: all 0.3s ease;
     }
     
     .metric-card:hover {
-        transform: scale(1.05);
-        box-shadow: 0 20px 25px -5px rgba(102, 126, 234, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 12px -2px rgba(102, 126, 234, 0.4);
     }
     
     .metric-value {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 0.5rem;
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.25rem;
     }
     
     .metric-label {
-        font-size: 0.875rem;
+        font-size: 0.75rem;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        opacity: 0.9;
+        color: rgba(255, 255, 255, 0.9);
     }
     
-    /* Platform Badges - Enhanced */
+    /* Platform Badges - SMALLER & CLEANER */
     .platform-badge {
         display: inline-flex;
         align-items: center;
-        padding: 0.5rem 1rem;
-        border-radius: 12px;
+        padding: 0.35rem 0.75rem;
+        border-radius: 8px;
         font-weight: 600;
-        font-size: 0.875rem;
+        font-size: 0.75rem;
         margin: 0.25rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
-    .platform-badge:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-    }
+    .badge-instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 50%, #dc2743 100%); color: white; }
+    .badge-youtube { background: #FF0000; color: white; }
+    .badge-tiktok { background: #000000; color: white; }
+    .badge-reddit { background: #FF4500; color: white; }
+    .badge-facebook { background: #1877F2; color: white; }
+    .badge-twitter { background: #1DA1F2; color: white; }
+    .badge-linkedin { background: #0077B5; color: white; }
+    .badge-other { background: #6c757d; color: white; }
     
-    .badge-instagram { 
-        background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-        color: white;
-    }
-    .badge-youtube { 
-        background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
-        color: white;
-    }
-    .badge-tiktok { 
-        background: linear-gradient(135deg, #000000 0%, #EE1D52 50%, #69C9D0 100%);
-        color: white;
-    }
-    .badge-reddit { 
-        background: linear-gradient(135deg, #FF4500 0%, #FF5722 100%);
-        color: white;
-    }
-    .badge-facebook { 
-        background: linear-gradient(135deg, #1877F2 0%, #0C63D4 100%);
-        color: white;
-    }
-    .badge-twitter { 
-        background: linear-gradient(135deg, #1DA1F2 0%, #0C85D0 100%);
-        color: white;
-    }
-    .badge-linkedin { 
-        background: linear-gradient(135deg, #0077B5 0%, #005885 100%);
-        color: white;
-    }
-    .badge-other { 
-        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    /* Sidebar - FIXED CONTRAST */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
         color: white;
     }
     
-    /* Upload Section */
-    .upload-section {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    section[data-testid="stSidebar"] > div {
+        background: transparent;
+    }
+    
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] div {
+        color: white !important;
+    }
+    
+    section[data-testid="stSidebar"] .stMarkdown {
+        color: white;
+    }
+    
+    /* Sidebar info box */
+    .sidebar-info {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 1rem;
+        border-radius: 8px;
+        color: white;
+        margin: 1rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Sidebar divider */
+    section[data-testid="stSidebar"] hr {
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Upload Section Card */
+    .upload-card {
+        background: white;
         border: 2px dashed #cbd5e0;
-        border-radius: 16px;
-        padding: 3rem;
+        border-radius: 12px;
+        padding: 2rem;
         text-align: center;
         transition: all 0.3s ease;
     }
     
-    .upload-section:hover {
+    .upload-card:hover {
         border-color: #667eea;
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        background: #f8fafc;
     }
     
-    /* Buttons - Enhanced */
-    .stButton > button {
+    /* Section Headers */
+    .section-header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 2rem 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Quick Start Card - FIXED ICONS */
+    .quick-start-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        height: 100%;
+    }
+    
+    .quick-start-step {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .step-number {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.4);
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        font-weight: 700;
+        flex-shrink: 0;
     }
     
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(102, 126, 234, 0.6);
+    .step-text {
+        font-size: 0.875rem;
+        color: #475569;
+        font-weight: 500;
     }
     
-    /* Sidebar Styling */
-    .css-1d391kg, [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .css-1d391kg .sidebar-content, [data-testid="stSidebar"] > div:first-child {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 0;
-    }
-    
-    /* File Uploader Custom Style */
-    [data-testid="stFileUploader"] {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        border: 2px dashed #cbd5e0;
-        transition: all 0.3s ease;
-    }
-    
-    [data-testid="stFileUploader"]:hover {
-        border-color: #667eea;
-    }
-    
-    /* Expander Custom Style */
-    .streamlit-expanderHeader {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-radius: 12px;
-        font-weight: 600;
-        transition: all 0.2s ease;
-    }
-    
-    .streamlit-expanderHeader:hover {
-        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-    }
-    
-    /* Progress Bar */
-    .stProgress > div > div > div > div {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    /* Success/Error/Info Messages */
-    .stSuccess {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        border-radius: 12px;
-        padding: 1rem;
-        border: none;
-    }
-    
-    .stError {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
-        border-radius: 12px;
-        padding: 1rem;
-        border: none;
-    }
-    
-    .stInfo {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        color: white;
-        border-radius: 12px;
-        padding: 1rem;
-        border: none;
-    }
-    
-    /* Dataframe Styling */
-    .dataframe {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Stats Grid */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin: 2rem 0;
-    }
-    
-    /* Feature Card */
+    /* Feature Cards - SMALLER */
     .feature-card {
         background: white;
-        border-radius: 16px;
-        padding: 2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
         text-align: center;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
+        height: 100%;
     }
     
     .feature-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        border-color: #667eea;
     }
     
     .feature-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
     }
     
     .feature-title {
-        font-size: 1.25rem;
+        font-size: 1rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
         color: #1e293b;
     }
     
     .feature-description {
-        font-size: 0.875rem;
+        font-size: 0.8rem;
         color: #64748b;
-        line-height: 1.6;
-    }
-    
-    /* Animated Background Pattern */
-    .pattern-bg {
-        background-image: 
-            radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
-        animation: pattern-move 20s ease infinite;
-    }
-    
-    @keyframes pattern-move {
-        0%, 100% { background-position: 0% 0%; }
-        50% { background-position: 100% 100%; }
-    }
-    
-    /* Language Badge */
-    .language-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        margin: 0.25rem;
-    }
-    
-    /* Section Divider */
-    .section-divider {
-        height: 2px;
-        background: linear-gradient(90deg, transparent 0%, #667eea 50%, transparent 100%);
-        margin: 3rem 0;
-    }
-    
-    /* Tooltip */
-    .tooltip {
-        position: relative;
-        display: inline-block;
-        cursor: help;
+        line-height: 1.5;
     }
     
     /* Results Card */
-    .results-card {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid;
+    .results-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    /* Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.625rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
         transition: all 0.3s ease;
     }
     
-    .results-card:hover {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     
-    .results-card.instagram { border-left-color: #E1306C; }
-    .results-card.youtube { border-left-color: #FF0000; }
-    .results-card.tiktok { border-left-color: #000000; }
-    .results-card.reddit { border-left-color: #FF4500; }
-    .results-card.facebook { border-left-color: #1877F2; }
-    .results-card.twitter { border-left-color: #1DA1F2; }
-    .results-card.linkedin { border-left-color: #0077B5; }
-    
-    /* Pulse Animation */
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
+    /* Success/Error/Info Messages */
+    .stSuccess, .stError, .stInfo, .stWarning {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
     }
     
-    .pulse {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    /* Divider */
+    .section-divider {
+        height: 1px;
+        background: #e2e8f0;
+        margin: 2rem 0;
     }
     
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
     }
     
     ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
+        background: #f1f5f9;
     }
     
     ::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 10px;
+        background: #cbd5e1;
+        border-radius: 4px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        background: #94a3b8;
     }
     
-    /* Download Button Custom */
-    .download-button {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        padding: 0.75rem 1.5rem;
+    /* File uploader styling */
+    [data-testid="stFileUploader"] {
+        background: white;
         border-radius: 12px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4);
     }
     
-    .download-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.6);
+    [data-testid="stFileUploader"] section {
+        border: 2px dashed #cbd5e0;
+        border-radius: 12px;
+    }
+    
+    [data-testid="stFileUploader"] section:hover {
+        border-color: #667eea;
+    }
+    
+    /* Expander */
+    .streamlit-expanderHeader {
+        background: #f8fafc;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .streamlit-expanderHeader:hover {
+        background: #f1f5f9;
+    }
+    
+    /* Dataframe */
+    .dataframe {
+        font-size: 0.875rem;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -718,7 +625,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Sidebar configuration with modern styling
+# Sidebar configuration
 with st.sidebar:
     st.markdown("### ⚙️ Configuration Panel")
     st.markdown("---")
@@ -732,8 +639,7 @@ with st.sidebar:
     )
     
     st.markdown("""
-        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                    padding: 1rem; border-radius: 12px; color: white; margin: 1rem 0;'>
+        <div class='sidebar-info'>
             <strong>🌍 Adaptive Thresholds:</strong><br>
             • CJK Languages: 3 chars<br>
             • Thai/Khmer: 5 chars<br>
@@ -751,47 +657,39 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 📦 Export Settings")
     split_files = st.checkbox("📑 Auto-split large files (10k+ rows)", value=True)
-    
-    st.markdown("---")
-    st.markdown("""
-        <div style='text-align: center; padding: 1rem;'>
-            <div style='font-size: 2rem; margin-bottom: 0.5rem;'>🌏</div>
-            <div style='font-size: 0.875rem; color: #64748b;'>
-                <strong>50+ Languages</strong><br>
-                Powered by Unicode Analysis
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
 
 # Main content area
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.markdown("### 📤 Upload Your Data")
+    st.markdown('<div class="section-header">📤 Upload Your Data</div>', unsafe_allow_html=True)
     uploaded_files = st.file_uploader(
         "Drag and drop files here or click to browse",
         type=['csv', 'xlsx', 'xls'],
         accept_multiple_files=True,
-        help="Support for CSV and Excel formats"
+        help="Support for CSV and Excel formats",
+        label_visibility="collapsed"
     )
     
     if uploaded_files:
         st.success(f"✓ {len(uploaded_files)} file(s) ready for processing")
 
 with col2:
-    st.markdown("### 💡 Quick Start")
+    st.markdown('<div class="section-header">💡 Quick Start</div>', unsafe_allow_html=True)
     st.markdown("""
-        <div class="feature-card">
-            <div class="feature-icon">1️⃣</div>
-            <div class="feature-description">Upload your files</div>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">2️⃣</div>
-            <div class="feature-description">Label platforms</div>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">3️⃣</div>
-            <div class="feature-description">Clean & download</div>
+        <div class="quick-start-card">
+            <div class="quick-start-step">
+                <div class="step-number">1</div>
+                <div class="step-text">Upload your files</div>
+            </div>
+            <div class="quick-start-step">
+                <div class="step-number">2</div>
+                <div class="step-text">Label platforms</div>
+            </div>
+            <div class="quick-start-step">
+                <div class="step-number">3</div>
+                <div class="step-text">Clean & download</div>
+            </div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -799,25 +697,16 @@ if uploaded_files:
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
     
     # Platform labeling section
-    st.markdown("### 🏷️ Platform Classification")
-    st.markdown("Assign each dataset to its source platform for organized processing:")
+    st.markdown('<div class="section-header">🏷️ Platform Classification</div>', unsafe_allow_html=True)
     
     file_platforms = {}
     
-    # Create grid layout for platform selection
     num_cols = min(len(uploaded_files), 3)
     cols = st.columns(num_cols)
     
     for idx, uploaded_file in enumerate(uploaded_files):
         with cols[idx % num_cols]:
-            st.markdown(f"""
-                <div class="custom-card">
-                    <div style="font-weight: 600; margin-bottom: 0.5rem; color: #1e293b;">
-                        📄 {uploaded_file.name}
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-            
+            st.markdown(f"**📄 {uploaded_file.name}**")
             platform = st.selectbox(
                 "Select platform",
                 ["Instagram", "YouTube", "TikTok", "Reddit", "Facebook", "Twitter", "LinkedIn", "Other"],
@@ -836,7 +725,6 @@ if uploaded_files:
             st.session_state.cleaned_results = []
             st.session_state.processing_complete = False
             
-            # Create progress bar
             progress_bar = st.progress(0)
             status_text = st.empty()
             
@@ -905,7 +793,7 @@ if uploaded_files:
 if st.session_state.processing_complete and st.session_state.cleaned_results:
     
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
-    st.markdown("## 📊 Processing Results")
+    st.markdown('<div class="section-header">📊 Processing Results</div>', unsafe_allow_html=True)
     
     # Overall summary metrics
     total_original = sum(r['stats']['original_count'] for r in st.session_state.cleaned_results)
@@ -913,26 +801,25 @@ if st.session_state.processing_complete and st.session_state.cleaned_results:
     total_removed = total_original - total_cleaned
     overall_retention = round((total_cleaned / total_original) * 100, 2) if total_original > 0 else 0
     
-    # Create metric cards
+    # Metric cards
     metric_cols = st.columns(4)
     
     metrics_data = [
-        ("📥 Total Original", f"{total_original:,}", "#667eea"),
-        ("✅ Total Cleaned", f"{total_cleaned:,}", "#10b981"),
-        ("🗑️ Total Removed", f"{total_removed:,}", "#ef4444"),
-        ("📈 Retention Rate", f"{overall_retention}%", "#f59e0b")
+        ("📥 Total Original", f"{total_original:,}"),
+        ("✅ Total Cleaned", f"{total_cleaned:,}"),
+        ("🗑️ Total Removed", f"{total_removed:,}"),
+        ("📈 Retention Rate", f"{overall_retention}%")
     ]
     
-    for col, (label, value, color) in zip(metric_cols, metrics_data):
+    for col, (label, value) in zip(metric_cols, metrics_data):
         with col:
             st.markdown(f"""
-                <div class="metric-card" style="background: linear-gradient(135deg, {color} 0%, {color}dd 100%);">
+                <div class="metric-card">
                     <div class="metric-value">{value}</div>
                     <div class="metric-label">{label}</div>
                 </div>
             """, unsafe_allow_html=True)
     
-    # Create visualization
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
     
     # Processing summary chart
@@ -968,13 +855,9 @@ if st.session_state.processing_complete and st.session_state.cleaned_results:
         platform_class = result['platform'].lower().replace(' ', '-')
         
         st.markdown(f"""
-            <div class="results-card {platform_class}">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                    <div>
-                        <span class='platform-badge badge-{platform_class}'>{result['platform']}</span>
-                        <h3 style="display: inline; margin-left: 1rem; color: #1e293b;">{result['filename']}</h3>
-                    </div>
-                </div>
+            <div class="results-header">
+                <span class='platform-badge badge-{platform_class}'>{result['platform']}</span>
+                <span style="font-weight: 600; color: #1e293b;">{result['filename']}</span>
             </div>
         """, unsafe_allow_html=True)
         
@@ -1005,7 +888,7 @@ if st.session_state.processing_complete and st.session_state.cleaned_results:
                 ])
                 
                 fig_pie = px.pie(removal_df, values='Count', names='Category',
-                                color_discrete_sequence=px.colors.sequential.RdBu)
+                                color_discrete_sequence=['#667eea', '#f59e0b', '#ef4444', '#6c757d'])
                 fig_pie.update_layout(height=300)
                 st.plotly_chart(fig_pie, use_container_width=True)
             
@@ -1019,7 +902,7 @@ if st.session_state.processing_complete and st.session_state.cleaned_results:
             st.dataframe(result['preview'].head(10), use_container_width=True, height=300)
         
         # Download section
-        st.markdown(f"### 💾 Download Options")
+        st.markdown(f"**💾 Download Options**")
         
         cleaned_df = result['cleaned_df']
         CHUNK_SIZE = 10000
@@ -1041,8 +924,7 @@ if st.session_state.processing_complete and st.session_state.cleaned_results:
                     end_idx = min((i + 1) * CHUNK_SIZE, total_rows)
                     chunk_df = cleaned_df.iloc[start_idx:end_idx]
                     
-                    st.markdown(f"**Part {i+1}**")
-                    st.caption(f"{len(chunk_df):,} rows")
+                    st.caption(f"**Part {i+1}** ({len(chunk_df):,} rows)")
                     
                     output = io.BytesIO()
                     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -1107,7 +989,7 @@ else:
     # Empty state with features
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
     
-    st.markdown("## 🌟 Key Features")
+    st.markdown('<div class="section-header">🌟 Key Features</div>', unsafe_allow_html=True)
     
     feature_cols = st.columns(3)
     
@@ -1129,36 +1011,16 @@ else:
                     <div class="feature-description">{desc}</div>
                 </div>
             """, unsafe_allow_html=True)
-    
-    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
-    
-    # Language support showcase
-    st.markdown("## 🌏 Global Language Support")
-    
-    lang_cols = st.columns(4)
-    
-    languages = [
-        ("East Asia", ["🇨🇳 Chinese", "🇯🇵 Japanese", "🇰🇷 Korean"]),
-        ("Southeast Asia", ["🇹🇭 Thai", "🇻🇳 Vietnamese", "🇮🇩 Indonesian"]),
-        ("South Asia", ["🇮🇳 Hindi", "🇮🇳 Tamil", "🇮🇳 Telugu"]),
-        ("Europe & Middle East", ["🇪🇸 Spanish", "🇷🇺 Russian", "🇸🇦 Arabic"])
-    ]
-    
-    for col, (region, langs) in zip(lang_cols, languages):
-        with col:
-            st.markdown(f"**{region}**")
-            for lang in langs:
-                st.markdown(f"• {lang}")
 
 # Footer
 st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 st.markdown("""
-    <div style='text-align: center; padding: 2rem; color: #64748b;'>
-        <div style='font-size: 1.5rem; margin-bottom: 0.5rem;'>✨ CleanStream AI</div>
+    <div style='text-align: center; padding: 1.5rem; color: #64748b;'>
+        <div style='font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;'>✨ CleanStream AI</div>
         <div style='font-size: 0.875rem;'>
-            Powered by Unicode Intelligence • Built for Global Teams • Data Processed Locally
+            Powered by Unicode Intelligence • Built by Samvigya Trivedi • Data Processed Locally
         </div>
-        <div style='margin-top: 1rem; font-size: 0.75rem; opacity: 0.7;'>
+        <div style='margin-top: 0.75rem; font-size: 0.75rem; opacity: 0.7;'>
             v2.0 | Supporting 50+ Languages Worldwide
         </div>
     </div>
