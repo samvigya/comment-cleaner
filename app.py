@@ -24,7 +24,7 @@ if 'processing_complete' not in st.session_state:
 if 'file_platforms' not in st.session_state:
     st.session_state.file_platforms = {}
 
-# FIXED CSS - Sidebar Always Visible, No Collapse Button
+# FIXED CSS - Proper Sidebar Display
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -38,14 +38,16 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* HIDE SIDEBAR COLLAPSE BUTTON COMPLETELY */
+    /* HIDE SIDEBAR COLLAPSE BUTTON */
     [data-testid="collapsedControl"] {
         display: none !important;
     }
     
-    /* FORCE SIDEBAR TO STAY VISIBLE */
+    /* FORCE SIDEBAR TO STAY OPEN AND DISPLAY PROPERLY */
     section[data-testid="stSidebar"] {
         position: relative !important;
+        min-width: 21rem !important;
+        max-width: 21rem !important;
         transform: none !important;
         transition: none !important;
     }
@@ -53,6 +55,15 @@ st.markdown("""
     section[data-testid="stSidebar"] > div {
         transform: none !important;
         transition: none !important;
+        width: 100% !important;
+    }
+    
+    section[data-testid="stSidebar"] .stMarkdown,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] div {
+        writing-mode: horizontal-tb !important;
+        text-orientation: mixed !important;
     }
     
     /* Clean base */
@@ -83,26 +94,7 @@ st.markdown("""
         color: #718096;
     }
     
-    /* Card system */
-    .card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-        margin-bottom: 1rem;
-    }
-    
-    .card-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    /* Metrics - simplified */
+    /* Metrics */
     .metric-row {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -131,7 +123,7 @@ st.markdown("""
         letter-spacing: 0.05em;
     }
     
-    /* Platform badge - minimal */
+    /* Platform badges */
     .badge {
         display: inline-block;
         padding: 0.25rem 0.75rem;
@@ -150,7 +142,7 @@ st.markdown("""
     .badge-linkedin { background: #0077B5; }
     .badge-other { background: #6c757d; }
     
-    /* Sidebar - clean white, always visible */
+    /* Sidebar styling */
     section[data-testid="stSidebar"] {
         background: white;
         border-right: 1px solid #e2e8f0;
@@ -175,7 +167,7 @@ st.markdown("""
         margin: 1rem 0;
     }
     
-    /* Buttons - clean style */
+    /* Buttons */
     .stButton > button {
         background: #667eea;
         color: white;
@@ -192,7 +184,7 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
     
-    /* Tabs - modern minimal */
+    /* Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 2rem;
         background: white;
@@ -213,7 +205,7 @@ st.markdown("""
         border-bottom-color: #667eea;
     }
     
-    /* File uploader - clean */
+    /* File uploader */
     [data-testid="stFileUploader"] {
         border: 2px dashed #cbd5e0;
         border-radius: 8px;
@@ -226,7 +218,7 @@ st.markdown("""
         background: white;
     }
     
-    /* Expanders - minimal */
+    /* Expanders */
     .streamlit-expanderHeader {
         background: #f7fafc;
         border-radius: 6px;
@@ -244,19 +236,11 @@ st.markdown("""
         background: linear-gradient(90deg, #667eea, #764ba2);
     }
     
-    /* Success/Error messages - compact */
+    /* Messages */
     .stSuccess, .stError, .stInfo, .stWarning {
         padding: 0.75rem 1rem;
         border-radius: 6px;
         font-size: 0.875rem;
-    }
-    
-    /* Download section */
-    .download-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
     }
     
     /* Scrollbar */
@@ -278,7 +262,7 @@ st.markdown("""
         background: #94a3b8;
     }
     
-    /* Result item - compact card */
+    /* Result item */
     .result-item {
         background: white;
         border: 1px solid #e2e8f0;
@@ -300,35 +284,6 @@ st.markdown("""
         font-weight: 600;
         color: #2d3748;
         font-size: 0.95rem;
-    }
-    
-    /* Stats grid - horizontal */
-    .stats-row {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
-        margin: 1rem 0;
-    }
-    
-    .stat-item {
-        text-align: center;
-        padding: 0.75rem;
-        background: #f7fafc;
-        border-radius: 6px;
-    }
-    
-    .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #2d3748;
-    }
-    
-    .stat-label {
-        font-size: 0.7rem;
-        color: #718096;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-top: 0.25rem;
     }
     
     /* Hide default streamlit metric styling */
@@ -580,7 +535,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Sidebar - Always Visible
+# Sidebar
 with st.sidebar:
     st.markdown("### ⚙️ Settings")
     
